@@ -1,0 +1,308 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .modal {
+            display: none;
+            width: 500px;
+            height: 250px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            position: absolute;
+            top: calc(50% - 100px);
+            left: calc(50% - 250px);
+            z-index: 3;
+            background: white;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            line-height: 1.5;
+        }
+
+        .body {
+            height: 130px;
+            padding: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 173px;
+        }
+
+        input {
+            margin: 5px;
+        }
+
+        .footer {
+            margin-left: auto;
+            margin-right: auto;
+            width: 200px;
+        }
+
+        .modal-shadow {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .title {
+            border-bottom: 1px solid #e5e5e5;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .text {
+            text-align: center;
+        }
+
+        #cancel {
+            background-color: red;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-weight: 800;
+            padding: 5px;
+            color: white;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 15px;
+            height: 15px;
+            opacity: 0.3;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .close:before,
+        .close:after {
+            position: absolute;
+            left: 15px;
+            content: ' ';
+            height: 15px;
+            width: 2px;
+            background-color: #333;
+        }
+
+        .close:before {
+            transform: rotate(45deg);
+        }
+
+        .close:after {
+            transform: rotate(-45deg);
+        }
+
+        #submit {
+            background-color: red;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-weight: 800;
+            padding: 5px;
+            color: white;
+
+        }
+    </style>
+
+    <script>
+        const users = [];
+        window.onload = () => {
+            const openModalButton = document.querySelector('#open-modal');
+            openModalButton.addEventListener('click', () => {
+                const modal = document.querySelector('#modal');
+                modal.style.display = 'block';
+                const modalShadow = document.querySelector('.modal-shadow');
+                modalShadow.style.display = 'block';
+            });
+            const cancelButton = document.querySelector('#cancel');
+            cancelButton.addEventListener('click', () => {
+                const modal = document.querySelector('#modal');
+                modal.style.display = 'none';
+                const modalShadow = document.querySelector('.modal-shadow');
+                modalShadow.style.display = 'none';
+            });
+
+            const closeModal = () => {
+                const modal = document.querySelector('#modal');
+                modal.style.display = 'none';
+
+                const modalShadow = document.querySelector('.modal-shadow');
+                modalShadow.style.display = 'none';
+
+                const emailInput = document.querySelector('#email');
+                emailInput.value = '';
+
+                const phoneInput = document.querySelector('#phone');
+                phoneInput.value = '';
+            };
+
+            const cancelBtn = document.querySelector('#cancel');
+            const closeBtn = document.querySelector('#close');
+            const modalShadow = document.querySelector('.modal-shadow');
+
+            cancelBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', closeModal);
+            modalShadow.addEventListener('click', closeModal);
+
+            // table under add button
+            const root = document.querySelector('body');
+            const table = document.createElement('table');
+            root.appendChild(table);
+
+
+            const renderTable = () => {
+                table.innerHTML = "";
+                users.forEach((user, key) => {
+                    const row = document.createElement('tr');
+
+                    const tdLogin = document.createElement('td');
+                    tdLogin.innerText = user.email;
+                    row.appendChild(tdLogin);
+
+                    const tdPhone = document.createElement('td');
+                    tdPhone.innerText = user.phone
+                    row.appendChild(tdPhone);
+
+                    const tdRm = document.createElement('td');
+                    const rmImg = document.createElement('img');
+                    rmImg.setAttribute("src", "http://s1.iconbird.com/ico/0612/vistabasesoftwareicons/w256h2561339252548CloseBoxRed.png");
+                    rmImg.setAttribute("width", 20);
+                    rmImg.setAttribute("data-index", key);
+                    tdRm.appendChild(rmImg);
+                    row.appendChild(tdRm);
+                    tdRm.addEventListener('click', remove);
+
+                    table.appendChild(row);
+                });
+            }
+
+            const remove = (element) => {
+                console.info(element);
+                const key = element.srcElement.getAttribute("data-index");
+                delete users[key];
+                renderTable();
+            }
+
+            const login = (element) => {
+
+                const email = document.querySelector('#email').value;
+                const phone = document.querySelector('#phone').value;
+                let errorsCount = 0;
+
+                if ( phone.length < 13) {
+                    if (!document.querySelector('#phoneErr')) {
+                        const phoneContainer = document.querySelector('#phoneContainer');
+                        const errEl = document.createElement('span');
+
+                        errEl.innerHTML = 'Invalid phone length';
+                        errEl.id = 'phoneErr';
+                        errEl.style.color = 'red';
+                        errEl.style.fontSize= 10;
+
+                        phoneContainer.appendChild(errEl);
+
+                        setTimeout(() => {
+                            const errEl = document.querySelector('#phoneErr');
+                            errEl.remove();
+                        }, 3000)
+
+                    }
+                    errorsCount++;
+
+                } else {
+                    if (document.querySelector('#phoneErr')) {
+                        const errEl = document.querySelector('#phoneErr');
+
+                        errEl.remove();/* remove удаляет элемент из разметки */
+                    }
+                }
+
+                if ( !email.includes('@')) {
+                    if (!document.querySelector('#emailErr')) {
+                        const emailContainer = document.querySelector('#emailContainer');
+                        const errElement = document.createElement('span');
+
+                        errElement.innerHTML = 'Invalid email';
+                        errElement.id = 'emailErr';
+                        errElement.style.color = 'red';
+                        errElement.style.fontSize= 10;
+
+                        emailContainer.appendChild(errElement);
+
+                        setTimeout(() => {
+                            const errElement = document.querySelector('#emailErr');
+                            errElement.remove();
+                        }, 3000)
+
+                    }
+                } else {
+                    if (document.querySelector('#emailErr')) {
+                        const errElement = document.querySelector('#emailErr');
+
+                        errElement.remove();
+                    }
+                }
+
+                if (errorsCount == 0) {
+                    users.push(
+                        {
+                            email: email,
+                            phone: phone
+                        }
+                    )
+
+                    renderTable();
+                }
+
+                console.log(errorsCount);
+            }
+
+            const submitButton = document.querySelector('#submit');
+            submitButton.addEventListener('click', () => {
+                const emailInput = document.querySelector('#email');
+                const phoneInput = document.querySelector('#phone');
+
+                console.log(
+                    {
+                        email: emailInput.value,
+                        phone: phoneInput.value
+
+                    }
+                )
+            });
+
+            submitButton.addEventListener('click', login);
+
+        };
+    </script>
+</head>
+
+<body>
+    <div id="root">
+        <button id="open-modal">ADD USER</button>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="title">ADD USER <span id="close" class="close"></span></div>
+        <div class="body">
+            <div id="emailContainer"><input type="text" id="email" placeholder="eraseusgod@gmail.com"></div>
+            <div id="phoneContainer"><input type="text" id="phone" placeholder="+375 (25) 504 87 97"></div>
+
+        </div>
+        <div class="footer">
+            <div style="float: left"><button id="submit">OK</button></div>
+            <div style="float: right"><button id="cancel">Cancel</button></div>
+
+        </div>
+    </div>
+    <div class="modal-shadow"></div>
+
+
+</body>
+
+</html>
